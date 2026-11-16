@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plant &amp; Animal Tissues — Interactive Presentation</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-2: #273549;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.14);
+      --plant: #34d399;
+      --plant-soft: rgba(52, 211, 153, 0.14);
+      --animal: #fb923c;
+      --animal-soft: rgba(251, 146, 60, 0.14);
+      --correct: #22c55e;
+      --correct-soft: rgba(34, 197, 94, 0.16);
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #172554 0%, var(--bg) 55%);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* Top Bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: rgba(15, 23, 42, 0.85);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .brand strong {
+      color: var(--text);
+    }
+
+    .controls-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--surface-2);
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #082f49;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #7dd3fc;
+      border-color: #7dd3fc;
+    }
+
+    /* Progress Bar */
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      background: var(--surface);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--plant), var(--accent));
+      transition: width 0.25s ease;
+    }
+
+    /* Main Slide Stage */
+    .stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 32px;
+      overflow-y: auto;
+    }
+
+    .slide-card {
+      width: 100%;
+      max-width: 1060px;
+      min-height: 520px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 36px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      animation: fadeSlide 0.22s ease-out;
+    }
+
+    @keyframes fadeSlide {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Title Slide */
+    .title-slide {
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .title-pill {
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .title-slide h1 {
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      line-height: 1.15;
+      max-width: 780px;
+    }
+
+    .title-slide p {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      max-width: 680px;
+      line-height: 1.6;
+    }
+
+    .title-stats {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .stat-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .stat-box strong {
+      color: var(--text);
+      display: block;
+      font-size: 1.2rem;
+    }
+
+    .title-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Slide Header */
+    .slide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .badge-plant {
+      background: var(--plant-soft);
+      color: var(--plant);
+    }
+
+    .badge-animal {
+      background: var(--animal-soft);
+      color: var(--animal);
+    }
+
+    .badge-question {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .badge-rationale {
+      background: var(--correct-soft);
+      color: var(--correct);
+    }
+
+    .item-counter {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Question Body */
+    .question-text {
+      font-size: clamp(1.15rem, 2vw, 1.48rem);
+      line-height: 1.5;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: clamp(0.98rem, 1.45vw, 1.12rem);
+      line-height: 1.45;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .option-item:hover {
+      border-color: var(--accent);
+      background: var(--surface-2);
+    }
+
+    .option-item.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .option-letter {
+      flex-shrink: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--accent);
+    }
+
+    .option-item.selected .option-letter {
+      background: var(--accent);
+      color: #082f49;
+      border-color: var(--accent);
+    }
+
+    /* Rationale Body */
+    .rationale-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .question-recap {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      padding-left: 14px;
+      border-left: 3px solid var(--border);
+    }
+
+    .answer-box {
+      background: var(--correct-soft);
+      border: 1.5px solid var(--correct);
+      border-radius: 14px;
+      padding: 18px 22px;
+    }
+
+    .answer-label {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      color: var(--correct);
+      margin-bottom: 6px;
+    }
+
+    .answer-text {
+      font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+      font-weight: 700;
+      line-height: 1.4;
+      color: #ffffff;
+    }
+
+    .rationale-box {
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+    }
+
+    .rationale-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .rationale-text {
+      font-size: clamp(1rem, 1.55vw, 1.18rem);
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+
+    /* Bottom Footer Navigation */
+    .footer-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(15, 23, 42, 0.85);
+      border-top: 1px solid var(--border);
+    }
+
+    .slide-hint {
+      color: var(--text-muted);
+      font-size: 0.86rem;
+    }
+
+    .nav-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @media (max-width: 720px) {
+      .stage {
+        padding: 12px;
+      }
+      .slide-card {
+        padding: 22px 20px;
+        min-height: auto;
+      }
+      .topbar, .footer-nav {
+        padding: 10px 14px;
+      }
+      .slide-hint {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span>🧬</span>
+      <span><strong>Plant &amp; Animal Tissues</strong> Review Deck</span>
+    </div>
+    <div class="controls-top">
+      <button class="btn" id="btnHome" title="Go to Title Slide">🏠 Title</button>
+      <button class="btn" id="btnShuffle" title="Reshuffle all 40 questions and choices (R)">🔀 Reshuffle</button>
+      <button class="btn" id="btnFullscreen" title="Toggle Fullscreen (F)">⛶ Fullscreen</button>
+    </div>
+  </header>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <main class="stage" id="stage"></main>
+
+  <footer class="footer-nav">
+    <div class="slide-hint">Use <strong>←</strong> / <strong>→</strong> or <strong>Space</strong> to navigate</div>
+    <div class="item-counter" id="slideCounter">Title Slide</div>
+    <div class="nav-buttons">
+      <button class="btn" id="btnPrev">← Previous</button>
+      <button class="btn btn-primary" id="btnNext">Next →</button>
+    </div>
+  </footer>
+
+  <script>
+    const QUESTIONS = [
+      // --- SET 1: PLANT TISSUES (1-10) ---
+      {
+        topic: "Plant Tissues",
+        question: "A grower sees eggplant leaves turning pale and sickly even though irrigation and fertilizer are both sufficient. Which is the most plausible cause?",
+        options: {
+          A: "Sclerenchyma fibers never formed to stiffen the stalk.",
+          B: "Collenchyma strands failed to give pliable support to the leaf stalks.",
+          C: "Phloem elements cannot distribute nitrogen, phosphorus, and sulfur to the foliage.",
+          D: "Epidermal cells did not secrete a waxy coating."
+        },
+        answer: "C",
+        rationale: "Pale, yellowing (chlorotic) leaves despite adequate soil nutrients indicate a failure in nutrient redistribution. Phloem elements (sieve-tube elements) transport sugars as well as mobile mineral nutrients like nitrogen, phosphorus, and sulfur to developing or needy foliage. Sclerenchyma, collenchyma, and the epidermal cuticle serve mechanical or protective roles rather than nutrient distribution."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "A tall cosmos plant sways in typhoon gusts. Its stalk arcs far over yet seldom snaps. Which tissue mainly gives a growing stem this combination of strength and give?",
+        options: {
+          A: "Collenchyma",
+          B: "Sclerenchyma",
+          C: "Parenchyma",
+          D: "Phloem"
+        },
+        answer: "A",
+        rationale: "Collenchyma consists of living cells with unevenly thickened primary cell walls (rich in pectin and cellulose, without lignin). This gives growing herbaceous stems flexible, pliable mechanical support so they can bend in wind without breaking—unlike rigid, dead sclerenchyma."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "A scientist finds that the sieve tubes in a shrub’s leaves are injured, while its vessels still work normally. What would most likely happen in time?",
+        options: {
+          A: "The stem would lose rigidity and sag.",
+          B: "The roots would be unable to pull in soil water.",
+          C: "The leaves would be unable to make any sugar at all.",
+          D: "The movement of sugars away from the leaves would slow down."
+        },
+        answer: "D",
+        rationale: "Sieve tubes are the sugar-conducting cells of the phloem (translocation). Because xylem vessels remain intact, water transport and turgor continue normally, and leaves can still perform photosynthesis initially—but exporting sugars from the leaves to other plant organs will slow down."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "Which scenario shows a simple permanent tissue carrying out its job?",
+        options: {
+          A: "Tracheids, fibers, and parenchyma conducting water through a trunk.",
+          B: "A lone layer of identical cells on a petal reducing evaporation.",
+          C: "Cells at a bud tip repeatedly dividing to lengthen the shoot.",
+          D: "Sieve elements and companion cells distributing sugar through the plant."
+        },
+        answer: "B",
+        rationale: "A simple permanent tissue is composed of only one type of mature, non-dividing cell (such as epidermis, parenchyma, collenchyma, or sclerenchyma). A single layer of identical epidermal cells reducing water loss matches this. Xylem and phloem are complex tissues made of multiple cell types, while bud-tip cells are meristematic."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "Which scenario best illustrates a complex permanent tissue?",
+        options: {
+          A: "Uniform, thin-walled cells storing starch in a potato tuber.",
+          B: "Actively dividing cells at the cambium thickening a stem.",
+          C: "Several kinds of cells cooperating as one unit to conduct materials through the plant.",
+          D: "A single layer of matching cells waterproofing the outside of a leaf."
+        },
+        answer: "C",
+        rationale: "Complex permanent tissues (xylem and phloem) consist of more than one type of cell working together as a coordinated functional unit to transport water, minerals, or food. Uniform starch-storing cells (parenchyma) and waterproofing leaf-surface cells (epidermis) are simple permanent tissues, while cambium is a lateral meristem."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "A learner examines two slides. Slide P shows the cortex of a root, made of one type of rounded, living cell. Slide Q shows a stem’s phloem containing sieve tubes, companion cells, and phloem fibers. Which analysis correctly explains how they differ?",
+        options: {
+          A: "P is simple because it has a single cell type; Q is complex because it combines several.",
+          B: "P is complex because it is found in the root; Q is simple because it conducts.",
+          C: "P is simple because its cells are dead; Q is complex because its cells are alive.",
+          D: "P is complex because its cells divide; Q is simple because they do not."
+        },
+        answer: "A",
+        rationale: "Permanent plant tissues are classified as simple or complex based on cellular composition, not organ location. Slide P (cortex parenchyma) is made of a single cell type, making it a simple permanent tissue. Slide Q (phloem) combines multiple distinct cell types—sieve tubes, companion cells, and fibers—making it a complex permanent tissue."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "Coconut husk fibers are twisted into tough doormats, although the fiber cells are dead at maturity. Why can the fibers still withstand so much wear?",
+        options: {
+          A: "Their cytoplasm stores heavy food reserves.",
+          B: "Their perforated end walls maintain sap pressure.",
+          C: "Their large central vacuoles keep them swollen and firm.",
+          D: "Their lignin-thickened walls give them rigidity and strength."
+        },
+        answer: "D",
+        rationale: "Coconut husk (coir) fibers are sclerenchyma fibers. Although their living protoplasts die at maturity, they leave behind thick secondary cell walls heavily impregnated with lignin, giving them exceptional tensile strength, stiffness, and durability against wear."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "During a scorching summer in Pangasinan, sugarcane plants lose water rapidly at noon, so the xylem pulls water upward under heavy tension. After the rains return, the roots are healthy, the stalks are firm, and there are no pests or discolored tissues, yet some plants remain limp. When a farmer cuts a limp stalk underwater, a stream of tiny bubbles escapes from the cut vessels. Which analysis best explains why these plants stay limp?",
+        options: {
+          A: "Phloem was plugged with starch, so sugar could not travel to the roots.",
+          B: "Gas pockets formed inside the xylem vessels, so the water columns were no longer continuous.",
+          C: "Guard cells divided too quickly, so leaves lost water through extra pores.",
+          D: "Collenchyma strands softened, so the stalks could no longer hold up the leaves."
+        },
+        answer: "B",
+        rationale: "Extreme transpiration tension during drought can pull dissolved air out of solution or through pit membranes, causing cavitation (air embolism). The escaping bubbles confirm that air pockets broke the continuous cohesion-tension water column inside the xylem vessels, preventing water from reaching the leaves even after rain returns."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "Sitaw seeds germinating inside a dark cabinet produce long sprouts and roots, but no green leaves have unfolded. Which analysis best explains how they keep growing?",
+        options: {
+          A: "Xylem manufactures sugar from soil minerals, so growth continues.",
+          B: "Sclerenchyma converts light into food, so growth continues.",
+          C: "Storage parenchyma breaks down reserved food, so growth continues.",
+          D: "Phloem absorbs water from the soil, so growth continues."
+        },
+        answer: "C",
+        rationale: "Before a seedling can photosynthesize in light, it relies on food reserves (starch, proteins, oils) stored inside the cotyledon or endosperm parenchyma cells. Enzymes break down these reserves into usable sugars and amino acids to fuel cell division and elongation."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "Mango trees have yellowing leaves and undersized fruits even though they are watered and fertilized. The leaves are not drooping but are packed with sugar. Bacteria spread by insects are found clogging the plant’s conducting tissue. Which analysis best explains these signs?",
+        options: {
+          A: "Phloem was blocked, so sugar could not leave the leaves.",
+          B: "Xylem was blocked, so water could not reach the leaves.",
+          C: "Root cells died, so minerals could not be absorbed.",
+          D: "Support cells weakened, so branches drooped under the fruit."
+        },
+        answer: "A",
+        rationale: "Firm, non-drooping leaves show that xylem water delivery is intact. However, sugars accumulating inside the leaves alongside stunted fruit growth clearly point to blocked phloem: photosynthates are trapped in the source leaves and cannot be translocated to the developing fruit sinks."
+      },
+
+      // --- SET 1: ANIMAL TISSUES (11-20) ---
+      {
+        topic: "Animal Tissues",
+        question: "A patient’s small intestine is damaged by disease and can no longer take up nutrients from digested food. Which epithelial function is most directly affected?",
+        options: {
+          A: "Shielding the surface from friction and wear",
+          B: "Absorbing digested nutrients through a tall lining",
+          C: "Releasing watery fluid from small glandular tubes",
+          D: "Letting gases pass quickly across a very thin barrier"
+        },
+        answer: "B",
+        rationale: "The small intestine is lined by simple columnar epithelium specialized with microvilli to maximize surface area for nutrient absorption. Abrasion protection belongs to stratified squamous epithelium, fluid secretion belongs to glandular epithelium, and rapid gas exchange belongs to simple squamous epithelium."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "After pneumonia, the simple squamous epithelium of a person’s air sacs is thickened by scarring. What is the most probable outcome?",
+        options: {
+          A: "Faster sweeping of mucus toward the throat to remove dust",
+          B: "Increased release of digestive enzymes into the airway",
+          C: "Better resistance of the air sacs to heavy abrasion",
+          D: "Slower movement of oxygen into the surrounding capillaries"
+        },
+        answer: "D",
+        rationale: "Alveoli are lined by a single, ultra-thin layer of simple squamous epithelium to minimize the diffusion distance for O₂ and CO₂. Scar tissue thickens this respiratory membrane, directly slowing the rate of oxygen diffusion into the pulmonary capillaries."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "Stratified cuboidal epithelium is uncommon in the body. In which situation is it doing its typical job?",
+        options: {
+          A: "Lining the larger excretory ducts of sweat glands",
+          B: "Forming the thin walls of air sacs for gas passage",
+          C: "Forming the outer skin layer to endure scraping",
+          D: "Lining the stomach to secrete acid and mucus"
+        },
+        answer: "A",
+        rationale: "Stratified cuboidal epithelium (typically two layers of cube-shaped cells) is relatively rare and serves a protective lining role in the larger ducts of exocrine glands such as sweat glands, mammary glands, and salivary glands."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A man notices a thick, soft layer beneath the skin of his waist and wonders what tissue it is. Where in the body is this tissue mostly located?",
+        options: {
+          A: "On the surfaces of joints as thin, slick sliding pads",
+          B: "Along the inner lining of blood vessels and heart chambers",
+          C: "Under the skin and around organs such as the kidneys and heart",
+          D: "Within the muscular walls of hollow organs such as the stomach"
+        },
+        answer: "C",
+        rationale: "The soft, thick tissue described is adipose (fat) connective tissue, which stores energy, insulates, and cushions. It is concentrated in the subcutaneous layer (hypodermis) beneath the skin and around vital internal organs like the kidneys, heart, and eyeballs."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "Which statement correctly contrasts dense regular and dense irregular connective tissue?",
+        options: {
+          A: "Regular has interwoven fibers for pull from many directions; irregular has parallel fibers.",
+          B: "Regular has parallel collagen bundles suited to pull in one direction; irregular has interwoven bundles that resist stress from many directions.",
+          C: "Regular is made mostly of elastic fibers; irregular is made mostly of reticular fibers.",
+          D: "Regular makes up the deep layer of the skin; irregular makes up tendons and ligaments."
+        },
+        answer: "B",
+        rationale: "Dense regular connective tissue (found in tendons and ligaments) packs collagen bundles tightly in parallel alignment to withstand strong unidirectional tension. Dense irregular connective tissue (found in the dermis and joint capsules) weaves collagen bundles in multiple planes to resist multidirectional stress."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A medical technologist examining a blood sample must place blood into one of the four primary tissue types. Which reasoning is correct?",
+        options: {
+          A: "Epithelial tissue, because it lines vessels and covers the body surface.",
+          B: "Muscle tissue, because it is constantly pushed along by the beating heart.",
+          C: "Nervous tissue, because it carries rapid signals between distant organs.",
+          D: "Connective tissue, because its cells are scattered in a nonliving liquid matrix called plasma."
+        },
+        answer: "D",
+        rationale: "Blood is classified as a specialized fluid connective tissue because, like all connective tissues, it develops from mesenchyme and consists of living cells (erythrocytes, leukocytes, and platelets) suspended within an abundant nonliving extracellular matrix—plasma."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A student consciously flexes her arm to lift a dumbbell. Which description of the muscle tissue involved explains this movement?",
+        options: {
+          A: "Long, cylindrical, striated fibers with many nuclei, contracting under conscious control",
+          B: "Tapered, nonstriated cells that contract slowly without conscious control",
+          C: "Branched, striated cells joined by special junctions, contracting involuntarily",
+          D: "Round, fat-laden cells that cushion and insulate the limb"
+        },
+        answer: "A",
+        rationale: "Lifting a dumbbell consciously uses skeletal muscle. Its cells (fibers) are long, cylindrical, multinucleated, and striated, and they operate under voluntary (conscious) nervous control. Tapered nonstriated cells describe smooth muscle, branched cells with special junctions describe cardiac muscle, and round fat-laden cells describe adipose tissue."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A physiologist explains why all the cells of the heart wall contract in unison instead of each beating independently. Which tissue feature best accounts for this?",
+        options: {
+          A: "Long, multinucleated fibers triggered by conscious commands",
+          B: "Tapered cells that contract slowly and lack striations",
+          C: "Branched cells connected by intercalated discs that pass signals rapidly",
+          D: "Tightly sealed cells that keep blood from leaking out of the chambers"
+        },
+        answer: "C",
+        rationale: "Cardiac muscle cells are branched and linked end-to-end by intercalated discs containing desmosomes (for mechanical attachment) and gap junctions. Gap junctions let electrical impulses pass rapidly from cell to cell, coordinating the myocardium to contract as a single functional unit."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A medication is given to widen a patient’s arteries and reduce blood pressure. Which tissue does it act on, and why?",
+        options: {
+          A: "Cardiac muscle, because its branched cells form the inner lining of every artery.",
+          B: "Smooth muscle, because its involuntary contraction and relaxation changes the diameter of vessels.",
+          C: "Dense connective tissue, because its fibers stretch and spring back with each heartbeat.",
+          D: "Skeletal muscle, because its voluntary contraction pushes blood along the vessels."
+        },
+        answer: "B",
+        rationale: "The tunica media of arterial walls contains concentric layers of involuntary smooth muscle. Vasodilator medications relax this smooth muscle, widening the vessel lumen (vasodilation), reducing peripheral resistance, and lowering blood pressure."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A student claims that nervous tissue is no more essential than any other tissue. Which reply best evaluates this claim and defends the importance of nervous tissue?",
+        options: {
+          A: "It stores energy that other tissues use as fuel.",
+          B: "It generates the force that moves the body.",
+          C: "It forms a barrier that keeps germs from entering other tissues.",
+          D: "It integrates and relays signals so that different tissues act in coordination."
+        },
+        answer: "D",
+        rationale: "While all four primary tissues are necessary for life, nervous tissue plays the uniquely integrative role of sensory reception, processing, and rapid electrical signaling—allowing muscles, glands, and organs across the body to respond and work together in harmony."
+      },
+
+      // --- SET 2: PLANT TISSUES (21-30) ---
+      {
+        topic: "Plant Tissues",
+        question: "Chili pepper plants in a farmer’s plot look pale and yellowish even though irrigation and fertilizer are both adequate. Which is the most likely reason?",
+        options: {
+          A: "Collenchyma did not thicken at the cell corners to reinforce the leaf stalks.",
+          B: "Sieve-tube elements are unable to deliver nitrogen, phosphorus, and sulfur to the tissues that need them.",
+          C: "The epidermis lacked a cuticle, so water evaporated too quickly.",
+          D: "Sclerenchyma failed to harden, so the stem could not stand upright."
+        },
+        answer: "B",
+        rationale: "When irrigation and soil fertilization are sufficient yet leaves turn pale and chlorotic, internal transport of mobile nutrients is disrupted. Sieve-tube elements of the phloem redistribute nitrogen, phosphorus, and sulfur (along with sugars) to growing shoots and leaves."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "A young hibiscus seedling in an open field bows deeply under a strong breeze but does not snap. Which tissue chiefly provides this bendable yet sturdy support to the growing stem?",
+        options: {
+          A: "Sclerenchyma",
+          B: "Xylem",
+          C: "Collenchyma",
+          D: "Parenchyma"
+        },
+        answer: "C",
+        rationale: "Collenchyma provides flexible support in young, elongating stems and petioles. Its living cells have thickened, non-lignified primary walls that stretch and bend without snapping under wind loads."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "The sieve tubes in the stem of a tomato plant are clogged, while its vessels continue to work well. What is the most probable long-term effect?",
+        options: {
+          A: "Sugars made in the leaves would be distributed less efficiently.",
+          B: "The roots would no longer be able to draw up water from the soil.",
+          C: "The stem would gradually lose its rigidity and droop.",
+          D: "The leaves would be unable to carry out any photosynthesis."
+        },
+        answer: "A",
+        rationale: "Sieve tubes form the phloem pathway that translocates sugars from photosynthetic leaves (sources) to roots, flowers, and fruits (sinks). With xylem vessels still functional, water transport continues, but sugar distribution will drop sharply."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "Which situation demonstrates a simple permanent tissue at work?",
+        options: {
+          A: "Vessel elements, tracheids, and fibers conducting water through a trunk.",
+          B: "Cells at the root cap dividing continuously to push the root downward.",
+          C: "Sieve tubes and companion cells moving food throughout the plant body.",
+          D: "Uniform, thin-walled cells filling a guava fruit and holding stored nutrients."
+        },
+        answer: "D",
+        rationale: "Parenchyma is a simple permanent tissue made of uniform, thin-walled living cells specialized for storage, photosynthesis, or secretion—as in the fleshy pulp of a guava fruit. Xylem (vessel elements, tracheids, fibers) and phloem (sieve tubes, companion cells) are complex tissues, while actively dividing cells are meristematic."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "Which situation best represents a complex permanent tissue?",
+        options: {
+          A: "Several distinct cell types functioning together as one unit to move water and minerals.",
+          B: "Undifferentiated cells at the stem tip dividing to add new growth.",
+          C: "A single layer of matching cells sealing the leaf surface against drying.",
+          D: "Identical living cells packed in a tuber to keep starch in reserve."
+        },
+        answer: "A",
+        rationale: "Complex permanent tissues consist of multiple different cell types integrated into one conducting unit—specifically xylem (vessels, tracheids, fibers, and xylem parenchyma) moving water and minerals. Dividing stem-tip cells represent an apical meristem, a single sealing leaf layer represents epidermis, and identical starch-storing cells represent storage parenchyma."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "A student studies two plant slides. Slide M shows the pith of a stem, built from only one kind of rounded living cell. Slide N shows a bundle of xylem containing vessels, tracheids, fibers, and parenchyma. Which analysis correctly explains how they differ?",
+        options: {
+          A: "M is complex since it sits in the center; N is simple since it conducts water.",
+          B: "M is simple since its cells are dead; N is complex since its cells are living.",
+          C: "M is simple since it has a single cell type; N is complex since it combines several.",
+          D: "M is complex since its cells keep dividing; N is simple since they have stopped dividing."
+        },
+        answer: "C",
+        rationale: "Slide M (pith parenchyma) is a simple permanent tissue because it contains only one type of mature cell. Slide N (xylem) is a complex permanent tissue because it combines four distinct cell types—vessels, tracheids, fibers, and parenchyma—into a single vascular tissue."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "Fibers from pineapple leaves are woven into fine cloth, even though the fiber cells are dead when mature. What explains their ability to resist stretching and crushing?",
+        options: {
+          A: "Large vacuoles full of sap keep the cells firm.",
+          B: "Their heavily thickened walls are reinforced with lignin.",
+          C: "Their sieve plates keep the internal pressure high.",
+          D: "Their cytoplasm is crowded with stored starch."
+        },
+        answer: "B",
+        rationale: "Piña cloth comes from sclerenchyma fibers in pineapple leaves. Even after the living protoplast dies at maturity, the thick, lignin-reinforced secondary cell walls retain immense tensile and compressive strength."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "During a harsh dry season in Mindanao, cassava plants lose water quickly at midday, so the xylem pulls water up under great tension. After heavy rain, the roots are sound, the stems are firm, and there are no signs of pests or rot, yet some plants stay limp. A farmer snips a limp stem underwater and sees a trail of tiny bubbles rising from the cut vessels. Which analysis best explains why these plants remain limp?",
+        options: {
+          A: "Sieve tubes collapsed in the dry soil, so sugar could not reach the roots.",
+          B: "Sclerenchyma lost its rigidity, so the stems could no longer hold the leaves up.",
+          C: "Gas pockets formed in the xylem vessels, so the water columns were interrupted.",
+          D: "Stomata multiplied too rapidly, so the leaves lost water through extra openings."
+        },
+        answer: "C",
+        rationale: "High water tension during severe drought triggers cavitation in xylem vessels, creating air bubbles (embolisms). The bubbles escaping from the submerged cut confirm that gas pockets disrupted the continuous water columns, blocking water uptake into the leaves even after rain."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "Peanut seeds germinating in a dark box send out long shoots and roots, but no green leaves have opened. Which analysis best explains how they continue to grow?",
+        options: {
+          A: "Parenchyma cells in the seed break down stored nutrients, so growth continues.",
+          B: "Xylem makes sugar out of soil minerals, so growth continues.",
+          C: "Phloem turns minerals into food, so growth continues.",
+          D: "Collenchyma captures light to make food, so growth continues."
+        },
+        answer: "A",
+        rationale: "During germination in the dark, the seedling cannot photosynthesize. Instead, storage parenchyma cells in the peanut cotyledons hydrolyze stored starch, lipids, and proteins to supply energy and carbon skeletons for shoot and root growth."
+      },
+      {
+        topic: "Plant Tissues",
+        question: "Pomelo trees show yellow leaves and stunted fruits despite regular watering and fertilizing. The leaves stay firm and are loaded with sugar. Insect-carried bacteria are found in the tissue that conducts food. Which analysis best explains these signs?",
+        options: {
+          A: "Xylem was blocked, so water could not reach the leaves.",
+          B: "Root cells died, so minerals could not be absorbed.",
+          C: "Support tissue weakened, so branches sagged under the weight of the fruit.",
+          D: "Phloem was blocked, so sugar built up in the leaves and could not be exported."
+        },
+        answer: "D",
+        rationale: "The food-conducting tissue is the phloem. Because the leaves remain turgid (firm), xylem water flow is working properly; however, bacterial blockage of the phloem traps photosynthetic sugars in the leaves and starves the developing fruits."
+      },
+
+      // --- SET 2: ANIMAL TISSUES (31-40) ---
+      {
+        topic: "Animal Tissues",
+        question: "A patient’s gut lining has been badly destroyed by chemotherapy and can no longer take up nutrients from digested food. Which tissue function is most directly impaired?",
+        options: {
+          A: "Providing a barrier against friction and wear",
+          B: "Producing mucus and enzymes through glandular cells",
+          C: "Taking up digested nutrients across a tall lining",
+          D: "Letting gases cross a very thin surface quickly"
+        },
+        answer: "C",
+        rationale: "The intestinal mucosa is lined by tall simple columnar epithelium bearing microvilli, which is specifically adapted to absorb digested nutrients. Destruction of this lining directly eliminates absorptive capacity."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A patient with lung fibrosis has scar tissue thickening the simple squamous lining of the air sacs. What is the most likely consequence?",
+        options: {
+          A: "Increased movement of mucus by cilia toward the throat",
+          B: "Slower passage of oxygen into the surrounding blood capillaries",
+          C: "Greater secretion of enzymes into the airway",
+          D: "Improved resistance of the air sacs to rough abrasion"
+        },
+        answer: "B",
+        rationale: "Gas exchange in the alveoli depends on diffusion across a paper-thin simple squamous epithelium. Fibrotic scarring thickens this barrier, increasing diffusion distance and slowing oxygen movement into the blood."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "Stratified cuboidal epithelium is seldom seen in the body. In which situation is it carrying out its typical role?",
+        options: {
+          A: "Lining the air sacs for quick gas exchange",
+          B: "Forming the outer layer of skin that resists rubbing",
+          C: "Lining the larger ducts of salivary and sweat glands",
+          D: "Lining the intestine to absorb nutrients"
+        },
+        answer: "C",
+        rationale: "Stratified cuboidal epithelium is specialized for strengthening and lining the larger excretory ducts of glands such as sweat glands, salivary glands, and mammary glands. Lining air sacs is done by simple squamous epithelium, forming the outer skin layer is done by stratified squamous epithelium, and lining the intestine for absorption is done by simple columnar epithelium."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A nutritionist points to the soft fatty layer under the skin of a client’s thighs and abdomen. Where in the body is this tissue mainly found?",
+        options: {
+          A: "On joint surfaces as thin, slippery pads",
+          B: "Along the inner surface of blood vessels and heart chambers",
+          C: "In the muscular walls of hollow organs such as the bladder",
+          D: "Under the skin and around organs such as the kidneys and eyeballs"
+        },
+        answer: "D",
+        rationale: "Adipose tissue is primarily distributed in the subcutaneous tissue (beneath the skin) and as protective, insulating padding around internal organs such as the kidneys, heart, and behind the eyeballs."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "Which statement correctly sets dense regular connective tissue apart from dense irregular connective tissue?",
+        options: {
+          A: "Regular has parallel collagen bundles that resist pull in one direction; irregular has collagen bundles arranged in many directions.",
+          B: "Regular forms the deeper skin layer; irregular forms tendons and ligaments.",
+          C: "Regular is made mostly of elastic fibers; irregular is made mostly of reticular fibers.",
+          D: "Regular has woven fibers that resist pull from many directions; irregular has parallel fibers."
+        },
+        answer: "A",
+        rationale: "Dense regular connective tissue (tendons, ligaments) aligns collagen fibers in parallel bundles to resist strong pulling forces along a single axis. Dense irregular connective tissue (dermis, organ capsules) arranges collagen bundles in crisscrossing directions to withstand multi-directional tension."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A lab analyst looking at a blood sample must assign blood to one of the four primary tissue types. Which reasoning is correct?",
+        options: {
+          A: "Epithelial tissue, since it lines the vessels it travels through.",
+          B: "Nervous tissue, since it relays messages rapidly between organs.",
+          C: "Connective tissue, since its cells are suspended in a nonliving fluid matrix called plasma.",
+          D: "Muscle tissue, since it is kept moving by the contractions of the heart."
+        },
+        answer: "C",
+        rationale: "Connective tissues are defined by cells dispersed within an abundant nonliving extracellular matrix. In blood, red blood cells, white blood cells, and platelets are suspended in a liquid extracellular matrix called plasma."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A swimmer deliberately kicks his legs to move forward. Which description of the muscle tissue involved explains this action?",
+        options: {
+          A: "Branched, striated cells linked by intercalated discs, contracting involuntarily",
+          B: "Spindle-shaped, nonstriated cells, contracting slowly and involuntarily",
+          C: "Round, fat-filled cells that insulate and cushion the leg",
+          D: "Long, cylindrical, striated, multinucleated fibers, contracting under voluntary control"
+        },
+        answer: "D",
+        rationale: "Deliberate kicking is driven by skeletal muscle, which consists of long, cylindrical, striated, multinucleated muscle fibers controlled voluntarily by the somatic nervous system."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A heart specialist explains why the cells of the heart wall contract together as one unit rather than separately. Which tissue feature best explains this?",
+        options: {
+          A: "Long, multinucleated fibers triggered by conscious commands",
+          B: "Branched cells joined by intercalated discs that let impulses spread rapidly",
+          C: "Tapered, nonstriated cells that contract slowly",
+          D: "Tightly sealed cells that stop blood from leaking out of the chambers"
+        },
+        answer: "B",
+        rationale: "Cardiac myocytes are branched and interconnected by specialized junctions called intercalated discs. Gap junctions within these discs allow action potentials to sweep rapidly across neighboring cells so the heart chambers contract synchronously."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A drug is prescribed to relax and widen a patient’s arteries to ease high blood pressure. Which tissue does the drug act on, and why?",
+        options: {
+          A: "Smooth muscle, because its involuntary contraction and relaxation changes the diameter of the vessels.",
+          B: "Cardiac muscle, because its branched cells form the inner lining of all arteries.",
+          C: "Skeletal muscle, because its voluntary contraction pushes blood through the vessels.",
+          D: "Dense connective tissue, because its fibers stretch and spring back with each pulse."
+        },
+        answer: "A",
+        rationale: "Arterial diameter is actively regulated by involuntary smooth muscle in the middle layer (tunica media) of the blood vessel wall. Relaxing this smooth muscle dilates the arteries and lowers blood pressure."
+      },
+      {
+        topic: "Animal Tissues",
+        question: "A student argues that nervous tissue is just as important as any other tissue and no more. Which response best judges this claim and defends the special importance of nervous tissue?",
+        options: {
+          A: "It stores energy that is used as fuel by other tissues.",
+          B: "It generates the force needed for movement.",
+          C: "It detects stimuli and coordinates responses so that all tissues act together.",
+          D: "It forms a barrier that keeps germs from entering the body."
+        },
+        answer: "C",
+        rationale: "Nervous tissue serves as the body’s master communication and control network. By sensing internal and external stimuli, integrating information, and sending rapid electrical signals, it coordinates the activities of muscles, glands, and organs into unified responses."
+      }
+    ];
+
+    let shuffledDeck = [];
+    let currentSlide = 0; // 0 = Title Slide, 1..80 = Question & Rationale pairs
+    let selectedOptions = {};
+
+    const stage = document.getElementById("stage");
+    const slideCounter = document.getElementById("slideCounter");
+    const progressFill = document.getElementById("progressFill");
+    const btnPrev = document.getElementById("btnPrev");
+    const btnNext = document.getElementById("btnNext");
+    const btnHome = document.getElementById("btnHome");
+    const btnShuffle = document.getElementById("btnShuffle");
+    const btnFullscreen = document.getElementById("btnFullscreen");
+
+    function shuffleArray(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function buildBalancedShuffledDeck() {
+      const letters = ["A", "B", "C", "D"];
+      const shuffledQuestions = shuffleArray(QUESTIONS);
+
+      // Build an evenly distributed pool of target answer letters (10 A, 10 B, 10 C, 10 D)
+      const targetLettersPool = [];
+      for (let i = 0; i < shuffledQuestions.length; i++) {
+        targetLettersPool.push(letters[i % letters.length]);
+      }
+      const shuffledTargets = shuffleArray(targetLettersPool);
+
+      return shuffledQuestions.map((item, idx) => {
+        const targetLetter = shuffledTargets[idx];
+        const correctText = item.options[item.answer];
+        const distractorTexts = shuffleArray(
+          letters
+            .filter((l) => l !== item.answer)
+            .map((l) => item.options[l])
+        );
+
+        const newOptions = {};
+        let dIdx = 0;
+        for (const letter of letters) {
+          if (letter === targetLetter) {
+            newOptions[letter] = correctText;
+          } else {
+            newOptions[letter] = distractorTexts[dIdx++];
+          }
+        }
+
+        return {
+          ...item,
+          options: newOptions,
+          answer: targetLetter
+        };
+      });
+    }
+
+    function initDeck(goToSlide = 0) {
+      shuffledDeck = buildBalancedShuffledDeck();
+      selectedOptions = {};
+      currentSlide = goToSlide;
+      renderSlide();
+    }
+
+    function totalSlides() {
+      return shuffledDeck.length * 2;
+    }
+
+    function renderSlide() {
+      const total = totalSlides();
+
+      btnPrev.disabled = currentSlide === 0;
+      btnNext.disabled = currentSlide === total;
+
+      if (currentSlide === 0) {
+        progressFill.style.width = "0%";
+        slideCounter.textContent = `Title Slide • ${shuffledDeck.length} Items (${total} Slides)`;
+        btnNext.textContent = "Start →";
+        renderTitleSlide();
+        return;
+      }
+
+      const progressPct = (currentSlide / total) * 100;
+      progressFill.style.width = `${progressPct}%`;
+      btnNext.textContent = currentSlide === total ? "Finish" : "Next →";
+
+      const itemIndex = Math.floor((currentSlide - 1) / 2);
+      const isRationale = (currentSlide - 1) % 2 === 1;
+      const item = shuffledDeck[itemIndex];
+      const qNum = itemIndex + 1;
+
+      slideCounter.textContent = `Slide ${currentSlide} of ${total}  |  Item ${qNum} of ${shuffledDeck.length} (${isRationale ? "Rationale" : "Question"})`;
+
+      if (!isRationale) {
+        renderQuestionSlide(item, qNum, itemIndex);
+      } else {
+        renderRationaleSlide(item, qNum);
+      }
+    }
+
+    function renderTitleSlide() {
+      stage.innerHTML = `
+        <section class="slide-card title-slide">
+          <span class="title-pill">Biology Review Presentation</span>
+          <h1>Plant &amp; Animal Tissues</h1>
+          <p>
+            Every session shuffles all <strong>40 questions</strong> and randomizes all <strong>choices (A–D)</strong> while keeping the correct answers equally distributed (<strong>10 A · 10 B · 10 C · 10 D</strong>).
+          </p>
+          <div class="title-stats">
+            <div class="stat-box"><strong>40</strong>Shuffled Questions</div>
+            <div class="stat-box"><strong>80</strong>Content Slides</div>
+            <div class="stat-box"><strong>10 Each (A–D)</strong>Balanced Answers</div>
+          </div>
+          <div class="title-actions">
+            <button class="btn btn-primary" onclick="goNext()">Start Presentation →</button>
+            <button class="btn" onclick="initDeck(0)">🔀 Reshuffle Questions &amp; Choices</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderQuestionSlide(item, qNum, itemIndex) {
+      const topicClass = item.topic === "Plant Tissues" ? "badge-plant" : "badge-animal";
+      const chosen = selectedOptions[itemIndex] || null;
+
+      const optionsHtml = ["A", "B", "C", "D"]
+        .map((letter) => {
+          const text = item.options[letter];
+          const selectedClass = chosen === letter ? "selected" : "";
+          return `
+            <div class="option-item ${selectedClass}" onclick="selectOption(${itemIndex}, '${letter}')">
+              <span class="option-letter">${letter}</span>
+              <span>${text}</span>
+            </div>
+          `;
+        })
+        .join("");
+
+      stage.innerHTML = `
+        <section class="slide-card">
+          <div>
+            <div class="slide-header">
+              <div class="badges">
+                <span class="badge ${topicClass}">${item.topic}</span>
+                <span class="badge badge-question">Question</span>
+              </div>
+              <span class="item-counter">Item ${qNum} of ${shuffledDeck.length}</span>
+            </div>
+            <div class="question-text">${qNum}. ${item.question}</div>
+            <div class="options-grid">
+              ${optionsHtml}
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderRationaleSlide(item, qNum) {
+      const topicClass = item.topic === "Plant Tissues" ? "badge-plant" : "badge-animal";
+      const answerText = item.options[item.answer];
+
+      stage.innerHTML = `
+        <section class="slide-card">
+          <div class="slide-header">
+            <div class="badges">
+              <span class="badge ${topicClass}">${item.topic}</span>
+              <span class="badge badge-rationale">Answer &amp; Rationale</span>
+            </div>
+            <span class="item-counter">Item ${qNum} of ${shuffledDeck.length}</span>
+          </div>
+
+          <div class="rationale-wrap">
+            <div class="question-recap"><strong>Q${qNum}:</strong> ${item.question}</div>
+
+            <div class="answer-box">
+              <div class="answer-label">Correct Answer</div>
+              <div class="answer-text">${item.answer}. ${answerText}</div>
+            </div>
+
+            <div class="rationale-box">
+              <div class="rationale-label">Rationale</div>
+              <div class="rationale-text">${item.rationale}</div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    window.selectOption = function (itemIndex, letter) {
+      selectedOptions[itemIndex] = letter;
+      renderSlide();
+    };
+
+    window.goNext = function () {
+      if (currentSlide < totalSlides()) {
+        currentSlide++;
+        renderSlide();
+      }
+    };
+
+    window.goPrev = function () {
+      if (currentSlide > 0) {
+        currentSlide--;
+        renderSlide();
+      }
+    };
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    btnNext.addEventListener("click", goNext);
+    btnPrev.addEventListener("click", goPrev);
+    btnHome.addEventListener("click", () => {
+      currentSlide = 0;
+      renderSlide();
+    });
+    btnShuffle.addEventListener("click", () => {
+      initDeck(0);
+    });
+    btnFullscreen.addEventListener("click", toggleFullscreen);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+        e.preventDefault();
+        goNext();
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        e.preventDefault();
+        goPrev();
+      } else if (e.key.toLowerCase() === "f") {
+        toggleFullscreen();
+      } else if (e.key.toLowerCase() === "r") {
+        initDeck(0);
+      }
+    });
+
+    // Shuffle questions and choices automatically on load
+    initDeck(0);
+  </script>
+</body>
+</html>
