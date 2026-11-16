@@ -1055,27 +1055,6 @@
       }
     }
 
-    function renderTitleSlide() {
-      stage.innerHTML = `
-        <section class="slide-card title-slide">
-          <span class="title-pill">Biology Review Presentation</span>
-          <h1>Plant &amp; Animal Tissues</h1>
-          <p>
-            Every session shuffles all <strong>40 questions</strong> and randomizes all <strong>choices (A–D)</strong> while keeping the correct answers equally distributed (<strong>10 A · 10 B · 10 C · 10 D</strong>).
-          </p>
-          <div class="title-stats">
-            <div class="stat-box"><strong>40</strong>Shuffled Questions</div>
-            <div class="stat-box"><strong>80</strong>Content Slides</div>
-            <div class="stat-box"><strong>10 Each (A–D)</strong>Balanced Answers</div>
-          </div>
-          <div class="title-actions">
-            <button class="btn btn-primary" onclick="goNext()">Start Presentation →</button>
-            <button class="btn" onclick="initDeck(0)">🔀 Reshuffle Questions &amp; Choices</button>
-          </div>
-        </section>
-      `;
-    }
-
     function renderQuestionSlide(item, qNum, itemIndex) {
       const topicClass = item.topic === "Plant Tissues" ? "badge-plant" : "badge-animal";
       const chosen = selectedOptions[itemIndex] || null;
